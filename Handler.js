@@ -23,8 +23,8 @@ class Handler {
         this.Client.aliases = new Collection()
         this.Client.prefixes = data.prefixes
         this.Client.disabled = data.disabled
-        this.loadDefaultCommands(data.directory)
         this.loadDeveloperCommands()
+        this.loadDefaultCommands(data.directory)
         this.Client.db.find({}, async (err, data) => {
             data.forEach(d => {
                 if (d) this.Client.guildPrefixes.set(d.id, d.prefix)
