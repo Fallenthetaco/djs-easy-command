@@ -9,7 +9,7 @@ class Command {
         this.nsfw = options.nsfw || false
         this.disabled = options.disabled || false
     }
-    async run(msg, args, Client) {
+    async run(Client, message, args) {
 
     }
 
