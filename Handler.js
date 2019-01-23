@@ -33,26 +33,26 @@ class Handler {
         Client.on('message', this._message.bind(this))
     }
 
-    async _message(msg) {
-        if (msg.author.bot) return
+    async _message(message) {
+        if (message.author.bot) return
         let prefix = false
-        let prefixes = [this.Client.guildPrefixes.get(msg.guild.id) || null].concat(this.Client.prefixes)
+        let prefixes = [this.Client.guildPrefixes.get(message.guild.id) || null].concat(this.Client.prefixes)
         for (const Prefix of prefixes) {
-            if (msg.content.startsWith(Prefix)) prefix = Prefix
+            if (message.content.startsWith(Prefix)) prefix = Prefix
         }
-        if (!msg.content.startsWith(prefix) || !prefix) return
-        let args = msg.content.slice(prefix.length).trim().split(/ +/)
+        if (!message.content.startsWith(prefix) || !prefix) return
+        let args = message.content.slice(prefix.length).trim().split(/ +/)
         let command = args.shift().toLowerCase()
         command = this.getCommand(command)
         if (command.error) return
-        if (command.isOwner() && (!this.Client.owners || !this.Client.owners.includes(msg.author.id))) return msg.reply('You have no permission to use this!')
-        if (command.isNSFW() && !msg.channel.nsfw) return msg.reply('This command is marked as NSFW, please use it in a NSFW channel.')
+        if (command.isOwner() && (!this.Client.owners || !this.Client.owners.includes(message.author.id))) return message.reply('You have no permission to use this!')
+        if (command.isNSFW() && !message.channel.nsfw) return message.reply('This command is marked as NSFW, please use it in a NSFW channel.')
         try {
-            command.run(msg, args, msg.client)
+            command.run(message.client, message, args)
         } catch (err) {
-            return msg.reply(`Oops, this shouldn't happen, please contact ${this.Client.owners.length < 1 ?
-                'the bot owners' : this.Client.owners.map(o => !msg.client.users.get(o) ? o :
-                    msg.client.users.get(o).tag).join(', or ')}. Here's the error\n\n\`${err.message}\``)
+            return message.reply(`Oops, this shouldn't happen, please contact ${this.Client.owners.length < 1 ?
+                'the bot owners' : this.Client.owners.map(o => !message.client.users.get(o) ? o :
+                    message.client.users.get(o).tag).join(', or ')}. Here's the error\n\n\`${err.message}\``)
         }
     }
 
