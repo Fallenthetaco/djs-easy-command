@@ -52,7 +52,7 @@ class Handler {
         if (!message.content.startsWith(prefix) || !prefix) return
         let args = message.content.slice(prefix.length).trim().split(/ +/)
         if (cooldown.has(message.author.id)) {
-            return message.channel.send(`<@${message.author.id}>, You have to wait 5 seconds before using the command again.`);
+            return message.reply(`<@${message.author.id}>, You have to wait 5 seconds before using the command again.`);
         }
 
         let command = args.shift().toLowerCase()
