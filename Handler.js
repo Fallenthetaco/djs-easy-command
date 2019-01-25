@@ -1,10 +1,9 @@
 const {
     Collection
 } = require('discord.js')
-const Discord = require('discord.js')
 const fs = require('fs')
 const DB = require('nedb')
-const cooldown = new Set();
+let cooldown = new Set();
 let cdseconds = 5;
 
 class Handler {
@@ -51,10 +50,7 @@ class Handler {
         }
         if (!message.content.startsWith(prefix) || !prefix) return
         let args = message.content.slice(prefix.length).trim().split(/ +/)
-        if (cooldown.has(message.author.id)) {
-            return message.reply(`<@${message.author.id}>, You have to wait 5 seconds before using the command again.`);
-        }
-
+        if (cooldown.has(message.author.id)) return message.reply(`<@${message.author.id}>, You have to wait 5 seconds before using the command again.`);
         let command = args.shift().toLowerCase()
         command = this.getCommand(command)
         if (command.error) return
