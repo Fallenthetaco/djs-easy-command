@@ -1,10 +1,19 @@
-const { Collection } = require('discord.js')
+const {
+    Collection
+} = require('discord.js')
+const Discord = require('discord.js')
 const fs = require('fs')
 const DB = require('nedb')
+const cooldown = new Set();
+let cdseconds = 5;
+
 class Handler {
     constructor(Client, data = {}) {
         this.Client = Client
-        this.Client.db = new DB({ filename: './main.db', autoload: true })
+        this.Client.db = new DB({
+            filename: './main.db',
+            autoload: true
+        })
         this.Client.guildPrefixes = new Collection()
         if (!this.Client) return new Error('Client must not be empty')
         if (!data.directory) return new Error('Directory must not be empty')
@@ -42,23 +51,43 @@ class Handler {
         }
         if (!message.content.startsWith(prefix) || !prefix) return
         let args = message.content.slice(prefix.length).trim().split(/ +/)
+        if (cooldown.has(message.author.id)) {
+
+            const embed = new Discord.RichEmbed()
+                .setColor(`#36393E`)
+                .setDescription(`<@${message.author.id}>, You have to wait 5 seconds before using the command again.`);
+            return message.channel.send(embed);
+        }
+
         let command = args.shift().toLowerCase()
         command = this.getCommand(command)
         if (command.error) return
         if (command.isOwner() && (!this.Client.owners || !this.Client.owners.includes(message.author.id))) return message.reply('You have no permission to use this!')
         if (command.isNSFW() && !message.channel.nsfw) return message.reply('This command is marked as NSFW, please use it in a NSFW channel.')
         try {
-            command.run(message.client, message, args)
+            if (command) {
+                if (!message.member.hasPermission('ADMINISTRATOR')) {
+                    cooldown.add(message.author.id);
+                }
+                command.run(message.client, message, args);
+
+            }
         } catch (err) {
             return message.reply(`Oops, this shouldn't happen, please contact ${this.Client.owners.length < 1 ?
                 'the bot owners' : this.Client.owners.map(o => !message.client.users.get(o) ? o :
                     message.client.users.get(o).tag).join(', or ')}. Here's the error\n\n\`${err.message}\``)
         }
+        setTimeout(() => {
+            cooldown.delete(message.author.id)
+        }, cdseconds * 1000);
+
     }
 
     getCommand(command) {
         if (!this.Client.commands.get(command)) command = this.Client.aliases.get(command)
-        if (!command || (this.disabled && this.disabled.includes(command))) return { error: "Not a command" }
+        if (!command || (this.disabled && this.disabled.includes(command))) return {
+            error: "Not a command"
+        }
         return this.Client.commands.get(command)
     }
 
@@ -77,7 +106,7 @@ class Handler {
         let commands = fs.readdirSync(directory)
         commands.filter(f => fs.statSync(directory + f).isDirectory())
             .forEach(nestedDir => fs.readdirSync(directory + nestedDir)
-            .forEach(f => commands.push(`${nestedDir}/${f}`)))
+                .forEach(f => commands.push(`${nestedDir}/${f}`)))
         commands = commands.filter(f => f.endsWith('.js'))
         if (commands.length < 1) return new Error(`'${directory}' has no commands in it.`)
 
