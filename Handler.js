@@ -74,6 +74,9 @@ class Handler {
                 'the bot owners' : this.Client.owners.map(o => !message.client.users.get(o) ? o :
                     message.client.users.get(o).tag).join(', or ')}. Here's the error\n\n\`${err.message}\``)
         }
+        setTimeout(() => {
+            cooldown.delete(message.author.id)
+        }, cdseconds * 1000);
     }
 
     getCommand(command) {
