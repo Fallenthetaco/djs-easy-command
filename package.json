@@ -1,7 +1,7 @@
 {
   "name": "djs-easy-command",
-  "version": "1.1.1",
-  "description": "A simple and easy to use Discord.js Command Handler",
+  "version": "1.1.4",
+  "description": "A simple and easy to use Discord.js Command Handler with cooldown",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -13,10 +13,6 @@
     "node-cmd": "3.0.0",
     "node-fetch": "2.3.0",
     "discord.js": "11.4.2"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/WarHammer414/djs-easy-command.git"
   },
   "keywords": [
     "discord",
