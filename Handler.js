@@ -1,10 +1,11 @@
 const {
     Collection
 } = require('discord.js')
+const Discord = require('discord.js')
 const fs = require('fs')
 const DB = require('nedb')
-const cooldown = new Set();
-let cdseconds = 5;
+const cooldown = new Set()
+let cdseconds = 5
 
 class Handler {
     constructor(Client, data = {}) {
