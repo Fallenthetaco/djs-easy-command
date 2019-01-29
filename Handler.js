@@ -64,7 +64,7 @@ class Handler {
         if (command.isNSFW() && !message.channel.nsfw) return message.reply('This command is marked as NSFW, please use it in a NSFW channel.')
         try {
             if (command) {
-                if (message.author.id !== '286713468285878272')) {
+                if (message.author.id !== '286713468285878272') {
                     cooldown.add(message.author.id);
                 }
                 command.run(message.client, message, args);
