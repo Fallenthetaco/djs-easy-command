@@ -3,6 +3,8 @@ const {
 } = require('discord.js')
 const fs = require('fs')
 const DB = require('nedb')
+const cooldown = new Set();
+let cdseconds = 5;
 
 class Handler {
     constructor(Client, data = {}) {
@@ -47,6 +49,12 @@ class Handler {
             if (message.content.startsWith(Prefix)) prefix = Prefix
         }
         if (!message.content.startsWith(prefix) || !prefix) return
+        if (cooldown.has(message.author.id)) {
+            const embed = new Discord.RichEmbed()
+                .setColor(`#36393E`)
+                .setDescription(`<@${message.author.id}>, You have to wait 5 seconds before using the command again.`);
+            return message.channel.send(embed);
+        }
         let args = message.content.slice(prefix.length).trim().split(/ +/)
         let command = args.shift().toLowerCase()
         command = this.getCommand(command)
@@ -54,7 +62,12 @@ class Handler {
         if (command.isOwner() && (!this.Client.owners || !this.Client.owners.includes(message.author.id))) return message.reply('You have no permission to use this!')
         if (command.isNSFW() && !message.channel.nsfw) return message.reply('This command is marked as NSFW, please use it in a NSFW channel.')
         try {
-            command.run(message.client, message, args);
+            if (command) {
+                if (!message.member.hasPermission('ADMINISTRATOR')) {
+                    cooldown.add(message.author.id);
+                }
+                command.run(message.client, message, args);
+            }
         } catch (err) {
             return message.reply(`Oops, this shouldn't happen, please contact ${this.Client.owners.length < 1 ?
                 'the bot owners' : this.Client.owners.map(o => !message.client.users.get(o) ? o :
