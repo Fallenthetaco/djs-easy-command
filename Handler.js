@@ -60,7 +60,7 @@ class Handler {
         let command = args.shift().toLowerCase()
         command = this.getCommand(command)
         if (command.error) return
-        if (command.isOwner() && (!this.Client.owners || !this.Client.owners.includes(message.author.id))) return message.reply('You have no permission to use this!')
+        if (command.isOwner() && (!this.Client.owners || !this.Client.owners.includes(message.author.id))) return message.reply('Sorry, you can'\'t use this command because the owner disabled it.')
         if (command.isNSFW() && !message.channel.nsfw) return message.reply('This command is marked as NSFW, please use it in a NSFW channel.')
         try {
             if (command) {
