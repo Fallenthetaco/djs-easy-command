@@ -45,7 +45,6 @@ class Handler {
 
     async _message(message) {
         if (message.author.bot) return;
-    if (message.channel.type === "dm") return;
           let prefix = false
         let prefixes = [this.Client.guildPrefixes.get(message.guild.id) || null].concat(this.Client.prefixes)
         for (const Prefix of prefixes) {
