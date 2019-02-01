@@ -4,6 +4,7 @@ const {
 const Discord = require('discord.js')
 const fs = require('fs')
 const DB = require('nedb')
+const db = require('quick.db')
 const cooldown = new Set()
 let cdseconds = 5
 
