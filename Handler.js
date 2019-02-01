@@ -129,7 +129,7 @@ class Handler {
         return message.channel.send(embed);
     }
     if (message.channel.type === "dm") return;
-=        let prefix = false
+          let prefix = false
         let prefixes = [this.Client.guildPrefixes.get(message.guild.id) || null].concat(this.Client.prefixes)
         for (const Prefix of prefixes) {
             if (message.content.startsWith(Prefix)) prefix = Prefix
