@@ -43,8 +43,93 @@ class Handler {
     }
 
     async _message(message) {
-        if (message.author.bot) return
-        let prefix = false
+        if (message.author.bot) return;
+    if (message.channel.type !== 'text') {
+        if (message.content = 'https://discord.gg') return;
+        let active = await db.fetch(`support_${message.author.id}`);
+        let guild = client.guilds.get('446775078240387093');
+        let role = guild.roles.find('name', "Member");
+        let channel, found = true;
+        try {
+            if (active) client.channels.get(active.channelID)
+                .guild;
+        } catch (e) {
+            found = false;
+        }
+        if (!active || !found) {
+            active = {};
+            channel = await guild.createChannel(`${message.author.username}-${message.author.discriminator}`).then(channel => channel.setParent("463841242678034472"));
+            channel.overwritePermissions(
+                role, {
+                    'READ_MESSAGES': false
+                }
+            )
+            let author = message.author;
+            const newChannel = new Discord.RichEmbed()
+                .setColor('RANDOM')
+                .setAuthor(author.tag, author.displayAvatarURL)
+                .setFooter('Support Ticket Created!')
+                .addField('User', author)
+                .addField('ID', author.id)
+            await channel.send(newChannel);
+            await channel.send('<@285077327074033676> You got a new support ticket.')
+            const newTicket = new Discord.RichEmbed()
+                .setColor('RANDOM')
+                .setAuthor(`Hello, ${author.username}`, author.displayAvatarURL)
+                .setFooter('Support Ticket Created!')
+            await author.send(newTicket);
+            active.channelID = channel.id;
+            active.targetID = author.id;
+        }
+        channel = client.channels.get(active.channelID);
+        const dm = new Discord.RichEmbed()
+            .setColor('RANDOM')
+            .setDescription(message.content)
+            .setAuthor(`Thank you, ${message.author.username}`, message.author.displayAvatarURL)
+            .setFooter(`Your message has been sent - A staff member will be in contact soon.`)
+        await message.author.send(dm);
+        if (message.content === '!complete') return;
+        const embed = new Discord.RichEmbed()
+            .setColor('RANDOM')
+            .setAuthor(message.author.tag, message.author.displayAvatarURL)
+            .setDescription(message.content)
+            .setFooter(`Message Received - ${message.author.tag}`)
+        await channel.send(embed);
+        db.set(`support_${message.author.id}`, active);
+        db.set(`supportChannel_${channel.id}`, message.author.id);
+        return;
+    }
+    let support = await db.fetch(`supportChannel_${message.channel.id}`);
+    if (support) {
+        support = await db.fetch(`support_${support}`);
+        let supportUser = client.users.get(support.targetID);
+        if (!supportUser) return message.channel.delete();
+        if (message.content.toLowerCase() === '!complete') {
+            const complete = new Discord.RichEmbed()
+                .setColor('RANDOM')
+                .setAuthor(`Hey, ${supportUser.tag}`, supportUser.displayAvatarURL)
+                .setFooter('Ticket Closed -- FallenTheTaco Lab')
+                .setDescription('*Your ticket has been marked as complete. If you wish to reopen it, or create a new one, please send a message to the bot.*')
+            supportUser.send(complete);
+            message.channel.setParent('525343816035860480');
+            return db.delete(`support_${support.targetID}`);
+        }
+        const embed = new Discord.RichEmbed()
+            .setColor('RANDOM')
+            .setAuthor(message.author.tag, message.author.displayAvatarURL)
+            .setFooter(`Message Received - FallenTheTaco Lab`)
+            .setDescription(message.content)
+        client.users.get(support.targetID)
+            .send(embed);
+        message.delete({
+            timeout: 10000
+        });
+        embed.setFooter(`Message Sent -- ${supportUser.tag}`)
+            .setDescription(message.content);
+        return message.channel.send(embed);
+    }
+    if (message.channel.type === "dm") return;
+=        let prefix = false
         let prefixes = [this.Client.guildPrefixes.get(message.guild.id) || null].concat(this.Client.prefixes)
         for (const Prefix of prefixes) {
             if (message.content.startsWith(Prefix)) prefix = Prefix
