@@ -57,44 +57,45 @@ class Handler {
         if (command.isOwner() && (!this.Client.owners || !this.Client.owners.includes(message.author.id))) return message.reply('Sorry, you can\'t use this command because the owner disabled it.')
         if (command.isNSFW() && !message.channel.nsfw) return message.reply('This command is marked as NSFW, please use it in a NSFW channel.')
         if (commands.includes(command.name)) {
-        if (!cooldowns.has(command.name)) {
-            cooldowns.set(command.name, new Discord.Collection());
-        }
-        const now = Date.now();
-        const timestamps = cooldowns.get(command.name);
-        const cooldownAmount = (command.cooldown || 3) * 1000;
-
-        if (timestamps.has(message.author.id)) {
-            const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
-
-            if (now < expirationTime) {
-                const timeLeft = (expirationTime - now) / 1000;
-                const embed = new Discord.RichEmbed()
-                    .setColor('#36393E')
-                    .setDescription(`<@${message.author.id}>, Please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`)
-                return message.channel.send(embed);
+            if (!cooldowns.has(command.name)) {
+                cooldowns.set(command.name, new Discord.Collection());
             }
-        }
-        try {
-            if (command) {
-                command.run(message.client, message, args);
+            const now = Date.now();
+            const timestamps = cooldowns.get(command.name);
+            const cooldownAmount = (command.cooldown || 3) * 1000;
+
+            if (timestamps.has(message.author.id)) {
+                const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
+
+                if (now < expirationTime) {
+                    const timeLeft = (expirationTime - now) / 1000;
+                    const embed = new Discord.RichEmbed()
+                        .setColor('#36393E')
+                        .setDescription(`<@${message.author.id}>, Please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`)
+                    return message.channel.send(embed);
+                }
             }
-        } catch (err) {
-            return message.reply(`Oops, this shouldn't happen, please contact ${this.Client.owners.length < 1 ?
+            try {
+                if (command) {
+                    command.run(message.client, message, args);
+                }
+            } catch (err) {
+                return message.reply(`Oops, this shouldn't happen, please contact ${this.Client.owners.length < 1 ?
                 'the bot owners' : this.Client.owners.map(o => !message.client.users.get(o) ? o :
                     message.client.users.get(o).tag).join(', or ')}. Here's the error\n\n\`${err.message}\``)
-        }
-        timestamps.set(message.author.id, now);
-        setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
-    } else {
-        try {
-            if (command) {
-                command.run(message.client, message, args);
             }
-        } catch (err) {
-            return message.reply(`Oops, this shouldn't happen, please contact ${this.Client.owners.length < 1 ?
+            timestamps.set(message.author.id, now);
+            setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
+        } else {
+            try {
+                if (command) {
+                    command.run(message.client, message, args);
+                }
+            } catch (err) {
+                return message.reply(`Oops, this shouldn't happen, please contact ${this.Client.owners.length < 1 ?
                 'the bot owners' : this.Client.owners.map(o => !message.client.users.get(o) ? o :
                     message.client.users.get(o).tag).join(', or ')}. Here's the error\n\n\`${err.message}\``)
+            }
         }
     }
 
