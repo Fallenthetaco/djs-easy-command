@@ -55,72 +55,69 @@ class Handler {
         if (command.error) return
         if (command.isOwner() && (!this.Client.owners || !this.Client.owners.includes(message.author.id))) return message.reply('Sorry, you can\'t use this command because the owner disabled it.')
         if (command.isNSFW() && !message.channel.nsfw) return message.reply('This command is marked as NSFW, please use it in a NSFW channel.')
-        try {
-            if (command) {
-                if (!cooldowns.has(command.name)) {
-                    cooldowns.set(command.name, new Discord.Collection());
-                }
+        const now = Date.now();
+        const timestamps = cooldowns.get(command.name);
+        const cooldownAmount = (command.cooldown || 3) * 1000;
+        if (!cooldowns.has(command.name)) {
+            cooldowns.set(command.name, new Discord.Collection());
+        }
+        if (timestamps.has(message.author.id)) {
+            const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
 
-                const now = Date.now();
-                const timestamps = cooldowns.get(command.name);
-                const cooldownAmount = (command.cooldown || 3) * 1000;
-
-                if (timestamps.has(message.author.id)) {
-                    const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
-
-                    if (now < expirationTime) {
-                        const timeLeft = (expirationTime - now) / 1000;
-                        return message.reply(`please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`);
-                    }
-                    timestamps.set(message.author.id, now);
-                    setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
-                }
-                command.run(message.client, message, args);
+            if (now < expirationTime) {
+                const timeLeft = (expirationTime - now) / 1000;
+                return message.reply(`please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`);
             }
-        } catch (err) {
-            return message.reply(`Oops, this shouldn't happen, please contact ${this.Client.owners.length < 1 ?
+            timestamps.set(message.author.id, now);
+            setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
+            try {
+                if (command) {
+                    command.run(message.client, message, args);
+                }
+            } catch (err) {
+                return message.reply(`Oops, this shouldn't happen, please contact ${this.Client.owners.length < 1 ?
                 'the bot owners' : this.Client.owners.map(o => !message.client.users.get(o) ? o :
                     message.client.users.get(o).tag).join(', or ')}. Here's the error\n\n\`${err.message}\``)
+            }
         }
-    }
 
-    getCommand(command) {
-        if (!this.Client.commands.get(command)) command = this.Client.aliases.get(command)
-        if (!command || (this.disabled && this.disabled.includes(command))) return {
-            error: "Not a command"
+        getCommand(command) {
+            if (!this.Client.commands.get(command)) command = this.Client.aliases.get(command)
+            if (!command || (this.disabled && this.disabled.includes(command))) return {
+                error: "Not a command"
+            }
+            return this.Client.commands.get(command)
         }
-        return this.Client.commands.get(command)
-    }
 
-    loadDeveloperCommands() {
-        for (const file of fs.readdirSync(__dirname + '/commands/')) {
-            let command = require(__dirname + '/commands/' + file)
-            command = new command()
-            this.Client.commands.set(command.getName(), command)
-            for (const alias of command.getAliases()) {
-                this.Client.aliases.set(alias, command.getName())
+        loadDeveloperCommands() {
+            for (const file of fs.readdirSync(__dirname + '/commands/')) {
+                let command = require(__dirname + '/commands/' + file)
+                command = new command()
+                this.Client.commands.set(command.getName(), command)
+                for (const alias of command.getAliases()) {
+                    this.Client.aliases.set(alias, command.getName())
+                }
+            }
+        }
+
+        loadDefaultCommands(directory) {
+            let commands = fs.readdirSync(directory)
+            commands.filter(f => fs.statSync(directory + f).isDirectory())
+                .forEach(nestedDir => fs.readdirSync(directory + nestedDir)
+                    .forEach(f => commands.push(`${nestedDir}/${f}`)))
+            commands = commands.filter(f => f.endsWith('.js'))
+            if (commands.length < 1) return new Error(`'${directory}' has no commands in it.`)
+
+            for (const file of commands) {
+                let command = require(directory + file)
+                command = new command()
+                if (!command.getName()) return new Error(`'${file}' doesn't have a name.`)
+                this.Client.commands.set(command.getName(), command)
+                for (const alias of command.getAliases()) {
+                    this.Client.aliases.set(alias, command.getName())
+                }
             }
         }
     }
 
-    loadDefaultCommands(directory) {
-        let commands = fs.readdirSync(directory)
-        commands.filter(f => fs.statSync(directory + f).isDirectory())
-            .forEach(nestedDir => fs.readdirSync(directory + nestedDir)
-                .forEach(f => commands.push(`${nestedDir}/${f}`)))
-        commands = commands.filter(f => f.endsWith('.js'))
-        if (commands.length < 1) return new Error(`'${directory}' has no commands in it.`)
-
-        for (const file of commands) {
-            let command = require(directory + file)
-            command = new command()
-            if (!command.getName()) return new Error(`'${file}' doesn't have a name.`)
-            this.Client.commands.set(command.getName(), command)
-            for (const alias of command.getAliases()) {
-                this.Client.aliases.set(alias, command.getName())
-            }
-        }
-    }
-}
-
-module.exports = Handler;
+    module.exports = Handler;
