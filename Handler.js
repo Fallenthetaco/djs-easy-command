@@ -57,7 +57,7 @@ class Handler {
         }
 
         const now = Date.now();
-        const timestamps = cooldowns.get(command.name);
+        const timestamps = cooldowns.get(command);
         console.log(command);
 
         const cooldownAmount = (command.cooldown || 3) * 1000;
@@ -66,7 +66,7 @@ class Handler {
 
             if (now < expirationTime) {
                 const timeLeft = (expirationTime - now) / 1000;
-                return message.reply(`please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`);
+                return message.reply(`please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command}\` command.`);
             }
         }
         command = this.getCommand(command)
