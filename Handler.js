@@ -59,7 +59,7 @@ class Handler {
 
         const now = Date.now();
         const timestamps = cooldowns.get(message.author.id);
-         console.log(`Cooldown: ${cooldowns.map(x => x)}`);
+         console.log(`Cooldown: ${cooldowns}`);
          console.log(`Timestamps: ${timestamps}`);
         const cooldownAmount = (command.cooldown || 5) * 1000;
         if (timestamps.has(message.author.id)) {
@@ -76,7 +76,7 @@ class Handler {
         try {
             if (command) {
                 if (!cooldowns.has(message.author.id)) {
-                    cooldowns.set(message.author.id, new Discord.Collection());
+                    cooldowns.set(message.author.id);
                 }
                 command.run(message.client, message, args);
             }
