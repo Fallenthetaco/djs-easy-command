@@ -48,7 +48,7 @@ class Handler {
         for (const Prefix of prefixes) {
             if (message.content.startsWith(Prefix)) prefix = Prefix
         }
-
+        let commands = ['work', 'buy', 'sell', 'balance', 'daily', 'items', 'slots', 'coinflip', 'start', 'transfer', 'use'];
         if (!message.content.startsWith(prefix) || !prefix) return
         let args = message.content.slice(prefix.length).trim().split(/ +/)
         let command = args.shift().toLowerCase()
@@ -56,6 +56,7 @@ class Handler {
         if (command.error) return
         if (command.isOwner() && (!this.Client.owners || !this.Client.owners.includes(message.author.id))) return message.reply('Sorry, you can\'t use this command because the owner disabled it.')
         if (command.isNSFW() && !message.channel.nsfw) return message.reply('This command is marked as NSFW, please use it in a NSFW channel.')
+        if (commands.includes(command.name)) {
         if (!cooldowns.has(command.name)) {
             cooldowns.set(command.name, new Discord.Collection());
         }
@@ -85,6 +86,16 @@ class Handler {
         }
         timestamps.set(message.author.id, now);
         setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
+    } else {
+        try {
+            if (command) {
+                command.run(message.client, message, args);
+            }
+        } catch (err) {
+            return message.reply(`Oops, this shouldn't happen, please contact ${this.Client.owners.length < 1 ?
+                'the bot owners' : this.Client.owners.map(o => !message.client.users.get(o) ? o :
+                    message.client.users.get(o).tag).join(', or ')}. Here's the error\n\n\`${err.message}\``)
+        }
     }
 
     getCommand(command) {
