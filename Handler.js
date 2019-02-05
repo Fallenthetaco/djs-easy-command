@@ -56,9 +56,6 @@ class Handler {
         if (command.error) return
         if (command.isOwner() && (!this.Client.owners || !this.Client.owners.includes(message.author.id))) return message.reply('Sorry, you can\'t use this command because the owner disabled it.')
         if (command.isNSFW() && !message.channel.nsfw) return message.reply('This command is marked as NSFW, please use it in a NSFW channel.')
-        if (!cooldowns.has(command.name)) {
-            cooldowns.set(command.name, new Discord.Collection());
-        }
 
         const now = Date.now();
         const timestamps = cooldowns.get(command.name);
@@ -70,13 +67,16 @@ class Handler {
             if (now < expirationTime) {
                 const timeLeft = (expirationTime - now) / 1000;
                 const embed = new Discord.RichEmbed()
-                .setColor('#36393E')
-                .setDescription(`<@${message.author.id}>, Please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`)
+                    .setColor('#36393E')
+                    .setDescription(`<@${message.author.id}>, Please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`)
                 return message.channel.send(embed);
             }
         }
         try {
             if (command) {
+                if (!cooldowns.has(command.name)) {
+                    cooldowns.set(command.name, new Discord.Collection());
+                }
                 command.run(message.client, message, args);
             }
         } catch (err) {
