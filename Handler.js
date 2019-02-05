@@ -55,12 +55,12 @@ class Handler {
         if (command.error) return
         if (command.isOwner() && (!this.Client.owners || !this.Client.owners.includes(message.author.id))) return message.reply('Sorry, you can\'t use this command because the owner disabled it.')
         if (command.isNSFW() && !message.channel.nsfw) return message.reply('This command is marked as NSFW, please use it in a NSFW channel.')
-        const now = Date.now();
-        const timestamps = cooldowns.get(command.name);
-        const cooldownAmount = (command.cooldown || 3) * 1000;
         if (!cooldowns.has(command.name)) {
             cooldowns.set(command.name, new Discord.Collection());
         }
+        const now = Date.now();
+        const timestamps = cooldowns.get(command.name);
+        const cooldownAmount = (command.cooldown || 3) * 1000;
         if (timestamps.has(message.author.id)) {
             const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
 
