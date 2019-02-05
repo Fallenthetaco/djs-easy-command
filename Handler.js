@@ -86,7 +86,7 @@ class Handler {
                     message.client.users.get(o).tag).join(', or ')}. Here's the error\n\n\`${err.message}\``)
         }
         timestamps.set(message.author.id, now);
-        setTimeout(() => timestamps.delete(message.author.id);
+        setTimeout(() => timestamps.delete(message.author.id));
     }
 
     getCommand(command) {
