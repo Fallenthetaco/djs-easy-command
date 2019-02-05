@@ -4,7 +4,7 @@ const {
 const Discord = require('discord.js')
 const fs = require('fs')
 const DB = require('nedb')
-const cooldowns = new Set();
+const cooldowns = new Discord.Collection();
 
 class Handler {
     constructor(Client, data = {}) {
@@ -59,9 +59,10 @@ class Handler {
 
         const now = Date.now();
          console.log(`Cooldown: ${cooldowns}`);
+        const timestamps = cooldowns.get(message.author.id);
         const cooldownAmount = (command.cooldown || 5) * 1000;
-        if (cooldowns.has(message.author.id)) {
-            const expirationTime = message.author.id + cooldownAmount;
+        if (timestamps.has(message.author.id)) {
+            const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
 
             if (now < expirationTime) {
                 const timeLeft = (expirationTime - now) / 1000;
