@@ -48,15 +48,18 @@ class Handler {
         for (const Prefix of prefixes) {
             if (message.content.startsWith(Prefix)) prefix = Prefix
         }
+        
         if (!message.content.startsWith(prefix) || !prefix) return
         let args = message.content.slice(prefix.length).trim().split(/ +/)
         let command = args.shift().toLowerCase()
         if (!cooldowns.has(command.name)) {
             cooldowns.set(command.name, new Discord.Collection());
         }
+        
         const now = Date.now();
         const timestamps = cooldowns.get(command.name);
         console.log(command);
+        
         const cooldownAmount = (command.cooldown || 3) * 1000;
         if (timestamps.has(message.author.id)) {
             const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
@@ -120,5 +123,4 @@ class Handler {
             }
         }
     }
-
     module.exports = Handler;
