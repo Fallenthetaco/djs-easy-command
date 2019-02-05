@@ -4,7 +4,7 @@ const {
 const Discord = require('discord.js')
 const fs = require('fs')
 const DB = require('nedb')
-const cooldowns = new Discord.Collection();
+const cooldowns = new Set();
 
 class Handler {
     constructor(Client, data = {}) {
@@ -76,7 +76,7 @@ class Handler {
         try {
             if (command) {
                 if (!cooldowns.has(message.author.id)) {
-                    cooldowns.set(message.author.id);
+                    cooldowns.add(message.author.id);
                 }
                 command.run(message.client, message, args);
             }
@@ -86,7 +86,7 @@ class Handler {
                     message.client.users.get(o).tag).join(', or ')}. Here's the error\n\n\`${err.message}\``)
         }
         timestamps.set(message.author.id, now);
-        setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
+        setTimeout(() => timestamps.delete(message.author.id);
     }
 
     getCommand(command) {
