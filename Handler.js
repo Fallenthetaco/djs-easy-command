@@ -4,8 +4,7 @@ const {
 const Discord = require('discord.js')
 const fs = require('fs')
 const DB = require('nedb')
-const cooldown = new Set()
-let cdseconds = 5
+const cooldowns = new Discord.Collection();
 
 class Handler {
     constructor(Client, data = {}) {
