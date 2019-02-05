@@ -51,10 +51,6 @@ class Handler {
         if (!message.content.startsWith(prefix) || !prefix) return
         let args = message.content.slice(prefix.length).trim().split(/ +/)
         let command = args.shift().toLowerCase()
-        command = this.getCommand(command)
-        if (command.error) return
-        if (command.isOwner() && (!this.Client.owners || !this.Client.owners.includes(message.author.id))) return message.reply('Sorry, you can\'t use this command because the owner disabled it.')
-        if (command.isNSFW() && !message.channel.nsfw) return message.reply('This command is marked as NSFW, please use it in a NSFW channel.')
         if (!cooldowns.has(command.name)) {
             cooldowns.set(command.name, new Discord.Collection());
         }
@@ -68,6 +64,10 @@ class Handler {
                 const timeLeft = (expirationTime - now) / 1000;
                 return message.reply(`please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`);
             }
+        command = this.getCommand(command)
+        if (command.error) return
+        if (command.isOwner() && (!this.Client.owners || !this.Client.owners.includes(message.author.id))) return message.reply('Sorry, you can\'t use this command because the owner disabled it.')
+        if (command.isNSFW() && !message.channel.nsfw) return message.reply('This command is marked as NSFW, please use it in a NSFW channel.')
             try {
                 if (command) {
                     command.run(message.client, message, args);
