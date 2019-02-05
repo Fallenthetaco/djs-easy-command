@@ -74,10 +74,8 @@ class Handler {
         }
         try {
             if (command) {
-                if (message.author.id !== '286713468285878272') {
                 if (!cooldowns.has(message.author.id)) {
                     cooldowns.set(message.author.id, new Discord.Collection());
-                }
                 }
                 command.run(message.client, message, args);
             }
