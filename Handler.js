@@ -56,6 +56,7 @@ class Handler {
         }
         const now = Date.now();
         const timestamps = cooldowns.get(command.name);
+        console.log(command);
         const cooldownAmount = (command.cooldown || 3) * 1000;
         if (timestamps.has(message.author.id)) {
             const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
