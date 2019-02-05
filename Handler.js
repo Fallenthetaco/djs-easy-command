@@ -60,6 +60,7 @@ class Handler {
         const now = Date.now();
         const timestamps = cooldowns.get(command.name);
         const cooldownAmount = (command.cooldown || 5) * 1000;
+
         if (timestamps.has(message.author.id)) {
             const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
 
@@ -74,7 +75,7 @@ class Handler {
         try {
             if (command) {
                 if (!cooldowns.has(command.name)) {
-                    cooldowns.set(command.name, new Discord.Collection());
+                	cooldowns.set(command.name, new Discord.Collection());
                 }
                 command.run(message.client, message, args);
             }
@@ -84,7 +85,7 @@ class Handler {
                     message.client.users.get(o).tag).join(', or ')}. Here's the error\n\n\`${err.message}\``)
         }
         timestamps.set(message.author.id, now);
-        setTimeout(() => timestamps.delete(message.author.id));
+        setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
     }
 
     getCommand(command) {
