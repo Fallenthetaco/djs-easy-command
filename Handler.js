@@ -44,7 +44,7 @@ class Handler {
 
     async _message(message) {
         if (message.author.bot) return;
-          let prefix = false
+        let prefix = false
         let prefixes = [this.Client.guildPrefixes.get(message.guild.id) || null].concat(this.Client.prefixes)
         for (const Prefix of prefixes) {
             if (message.content.startsWith(Prefix)) prefix = Prefix
@@ -64,8 +64,23 @@ class Handler {
         if (command.isNSFW() && !message.channel.nsfw) return message.reply('This command is marked as NSFW, please use it in a NSFW channel.')
         try {
             if (command) {
-                if (message.author.id !== '286713468285878272') {
-                    cooldown.add(message.author.id);
+                if (!cooldowns.has(command.name)) {
+                    cooldowns.set(command.name, new Discord.Collection());
+                }
+
+                const now = Date.now();
+                const timestamps = cooldowns.get(command.name);
+                const cooldownAmount = (command.cooldown || 3) * 1000;
+
+                if (timestamps.has(message.author.id)) {
+                    const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
+
+                    if (now < expirationTime) {
+                        const timeLeft = (expirationTime - now) / 1000;
+                        return message.reply(`please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`);
+                    }
+                    timestamps.set(message.author.id, now);
+                    setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
                 }
                 command.run(message.client, message, args);
             }
@@ -74,9 +89,6 @@ class Handler {
                 'the bot owners' : this.Client.owners.map(o => !message.client.users.get(o) ? o :
                     message.client.users.get(o).tag).join(', or ')}. Here's the error\n\n\`${err.message}\``)
         }
-        setTimeout(() => {
-            cooldown.delete(message.author.id)
-        }, cdseconds * 1000);
     }
 
     getCommand(command) {
