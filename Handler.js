@@ -74,7 +74,7 @@ class Handler {
         try {
             if (command) {
                 if (!cooldowns.has(command.name)) {
-                    cooldowns.add(command.name, new Discord.Collection());
+                    cooldowns.set(command.name, new Discord.Collection());
                 }
                 command.run(message.client, message, args);
             }
