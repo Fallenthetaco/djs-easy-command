@@ -49,12 +49,6 @@ class Handler {
             if (message.content.startsWith(Prefix)) prefix = Prefix
         }
         if (!message.content.startsWith(prefix) || !prefix) return
-        if (cooldown.has(message.author.id)) {
-            const embed = new Discord.RichEmbed()
-                .setColor(`#36393E`)
-                .setDescription(`<@${message.author.id}>, You have to wait 5 seconds before using the command again.`);
-            return message.channel.send(embed);
-        }
         let args = message.content.slice(prefix.length).trim().split(/ +/)
         let command = args.shift().toLowerCase()
         command = this.getCommand(command)
