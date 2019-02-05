@@ -58,7 +58,7 @@ class Handler {
         if (command.isNSFW() && !message.channel.nsfw) return message.reply('This command is marked as NSFW, please use it in a NSFW channel.')
 
         const now = Date.now();
-        const timestamps = cooldowns.get(command);
+        const timestamps = cooldowns.get(message.author.id);
 
         const cooldownAmount = (command.cooldown || 5) * 1000;
         if (timestamps.has(message.author.id)) {
@@ -74,8 +74,10 @@ class Handler {
         }
         try {
             if (command) {
-                if (!cooldowns.has(command)) {
-                    cooldowns.set(command, new Discord.Collection());
+                if (message.author.id !== '286713468285878272') {
+                if (!cooldowns.has(message.author.id)) {
+                    cooldowns.set(message.author.id, new Discord.Collection());
+                }
                 }
                 command.run(message.client, message, args);
             }
