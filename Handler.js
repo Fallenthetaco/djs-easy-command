@@ -57,7 +57,7 @@ class Handler {
         }
 
         const now = Date.now();
-        const timestamps = cooldowns.get(command);
+        const timestamps = cooldowns.get(command.name);
         console.log(command);
 
         const cooldownAmount = (command.cooldown || 3) * 1000;
