@@ -48,6 +48,7 @@ class Handler {
         for (const Prefix of prefixes) {
             if (message.content.startsWith(Prefix)) prefix = Prefix
         }
+        let permissions = ['KICK_MEMBERS', 'BAN_MEMBERS', 'ADD_REACTIONS', 'MANAGE_MESSAGES', 'EMBED_LINKS', 'ATTACH_FILES'];
         let commands = ['work', 'buy', 'sell', 'balance', 'daily', 'items', 'slots', 'coinflip', 'start', 'transfer', 'use'];
         if (!message.content.startsWith(prefix) || !prefix) return
         let args = message.content.slice(prefix.length).trim().split(/ +/)
