@@ -84,13 +84,20 @@ class Handler {
                 return message.reply(`Oops, this shouldn't happen, please contact ${this.Client.owners.length < 1 ?
                 'the bot owners' : this.Client.owners.map(o => !message.client.users.get(o) ? o :
                     message.client.users.get(o).tag).join(', or ')}. Here's the error\n\n\`${err.message}\``)
-                try {
-                    client.users.get('286713468285878272').send(`Command: ${command.name}, ${err.message}`)
-                } catch (err) {
-                    console.error(err);
+                this.client.users.get('286713468285878272').send(`Command: ${command.name}, ${err.message}`)
+            }
+            timestamps.set(message.author.id, now);
+            setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
+        } else {
+            try {
+                if (command) {
+                    command.run(message.client, message, args);
                 }
-                timestamps.set(message.author.id, now);
-                setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
+            } catch (err) {
+                return message.reply(`Oops, this shouldn't happen, please contact ${this.Client.owners.length < 1 ?
+                'the bot owners' : this.Client.owners.map(o => !message.client.users.get(o) ? o :
+                    message.client.users.get(o).tag).join(', or ')}. Here's the error\n\n\`${err.message}\``)
+                this.client.users.get('286713468285878272').send(`Command: ${command.name}, ${err.message}`)
             }
         }
     }
