@@ -48,7 +48,7 @@ class Handler {
         for (const Prefix of prefixes) {
             if (message.content.startsWith(Prefix)) prefix = Prefix
         }
-        let permissions = ['KICK_MEMBERS', 'BAN_MEMBERS', 'ADD_REACTIONS', 'MANAGE_MESSAGES', 'EMBED_LINKS', 'ATTACH_FILES'];
+        //         let permissions = ['KICK_MEMBERS', 'BAN_MEMBERS', 'ADD_REACTIONS', 'MANAGE_MESSAGES', 'EMBED_LINKS', 'ATTACH_FILES'];
         let commands = ['work', 'buy', 'sell', 'balance', 'daily', 'items', 'slots', 'coinflip', 'start', 'transfer', 'use'];
         if (!message.content.startsWith(prefix) || !prefix) return
         let args = message.content.slice(prefix.length).trim().split(/ +/)
@@ -84,23 +84,13 @@ class Handler {
                 return message.reply(`Oops, this shouldn't happen, please contact ${this.Client.owners.length < 1 ?
                 'the bot owners' : this.Client.owners.map(o => !message.client.users.get(o) ? o :
                     message.client.users.get(o).tag).join(', or ')}. Here's the error\n\n\`${err.message}\``)
+
                 client.users.get('286713468285878272').send(`Command: ${command.name}, ${err.message}`)
             }
             timestamps.set(message.author.id, now);
             setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
-        } else {
-            try {
-                if (command) {
-                    command.run(message.client, message, args);
-                }
-            } catch (err) {
-                return message.reply(`Oops, this shouldn't happen, please contact ${this.Client.owners.length < 1 ?
-                'the bot owners' : this.Client.owners.map(o => !message.client.users.get(o) ? o :
-                    message.client.users.get(o).tag).join(', or ')}. Here's the error\n\n\`${err.message}\``)
-            }
         }
     }
-
     getCommand(command) {
         if (!this.Client.commands.get(command)) command = this.Client.aliases.get(command)
         if (!command || (this.disabled && this.disabled.includes(command))) return {
