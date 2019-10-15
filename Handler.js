@@ -70,10 +70,7 @@ class Handler {
 
                 if (now < expirationTime) {
                     const timeLeft = (expirationTime - now) / 1000;
-                    const embed = new Discord.RichEmbed()
-                        .setColor('#36393E')
-                        .setDescription(`<@${message.author.id}>, Please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`)
-                    return message.channel.send(embed);
+                    return message.channel.send(`<@${message.author.id}>, Please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`);
                 }
             }
             try {
