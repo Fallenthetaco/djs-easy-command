@@ -81,11 +81,11 @@ class Handler {
                 message.reply(`Oops, this shouldn't happen, please contact ${this.Client.owners.length < 1 ?
                 'the bot owners' : this.Client.owners.map(o => !message.client.users.get(o) ? o :
                     message.client.users.get(o).tag).join(', or ')}. Here's the error\n\n\`${err.message}\``)
-                const embed = new Discord.RichEmbed()
+                const embed = new Discord.MessageEmbed()
                 .setColor('#36393E')
                 .setAuthor(`Command: ${command.name}`)
                 .setDescription(err.message)
-                return message.client.users.get('286713468285878272').send(embed)
+                return message.client.users.cache.get('286713468285878272').send(embed)
             }
             timestamps.set(message.author.id, now);
             setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
@@ -97,12 +97,12 @@ class Handler {
             } catch (err) {
                 message.reply(`Oops, this shouldn't happen, please contact ${this.Client.owners.length < 1 ?
                 'the bot owners' : this.Client.owners.map(o => !message.client.users.get(o) ? o :
-                    message.client.users.get(o).tag).join(', or ')}. Here's the error\n\n\`${err.message}\``)
-                const embed = new Discord.RichEmbed()
+                    message.client.users.cache.get(o).tag).join(', or ')}. Here's the error\n\n\`${err.message}\``)
+                const embed = new Discord.MessageEmbed()
                 .setColor('#36393E')
                 .setAuthor(`Command: ${command.name}`)
                 .setDescription(err.message)
-                return message.client.users.get('286713468285878272').send(embed)
+                return message.client.users.cache.get('286713468285878272').send(embed)
             }
         }
     }
